@@ -3,6 +3,7 @@ package sendy
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
@@ -129,6 +130,22 @@ func (request *Request) JSON(object interface{}) *Request {
 	}
 
 	request.body = bytes.NewReader(jsonBytes)
+	return request
+}
+
+// XML serializes the input object into the body of the
+// request in the form of XML.
+func (request *Request) XML(object interface{}) *Request {
+	if request.err != nil {
+		return request
+	}
+
+	xmlBytes, err := xml.Marshal(object)
+	if err != nil {
+		return request.setErr(err)
+	}
+
+	request.body = bytes.NewReader(xmlBytes)
 	return request
 }
 

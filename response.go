@@ -2,6 +2,7 @@ package sendy
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"io/ioutil"
 	"net/http"
 )
@@ -56,6 +57,21 @@ func (response *Response) JSON(object interface{}) *Response {
 	}
 
 	err := json.NewDecoder(response.httpResponse.Body).Decode(object)
+	if err != nil {
+		return response.setErr(err)
+	}
+
+	return response.Close()
+}
+
+// XML parses the response body as XML and deserializes it
+// into the input object.
+func (response *Response) XML(object interface{}) *Response {
+	if response.err != nil {
+		return response
+	}
+
+	err := xml.NewDecoder(response.httpResponse.Body).Decode(object)
 	if err != nil {
 		return response.setErr(err)
 	}
