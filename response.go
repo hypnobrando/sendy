@@ -1,26 +1,26 @@
 package sendy
 
 import (
+	"bytes"
 	"encoding/json"
 	"encoding/xml"
-	"io/ioutil"
-	"net/http"
 )
 
 // Response contains the response after making an HTTP
 // request and can be used for parsing / inspecting
 // the response.
 type Response struct {
-	httpResponse *http.Response
-	err          error
+	body       []byte
+	statusCode int
+	err        error
 }
 
 // StatusCode returns the HTTP status code of the response.
 // If there was an error making the request and no response was
 // read then the status code returned is -1.
 func (response *Response) StatusCode() int {
-	if response.httpResponse != nil {
-		return response.httpResponse.StatusCode
+	if response.statusCode != 0 {
+		return response.statusCode
 	}
 
 	return -1
@@ -31,24 +31,6 @@ func (response *Response) setErr(err error) *Response {
 	return response
 }
 
-// Close completes reading the HTTP response and closes the connection.
-// Close must be called if none of the other response reading
-// functions are called, otherwise there will be a leak in
-// HTTP connections.
-func (response *Response) Close() *Response {
-	if response.err != nil {
-		return response
-	}
-
-	_, err := ioutil.ReadAll(response.httpResponse.Body)
-	if err != nil {
-		return response.setErr(err)
-	}
-
-	err = response.httpResponse.Body.Close()
-	return response.setErr(err)
-}
-
 // JSON parses the response body as JSON and deserializes it
 // into the input object.
 func (response *Response) JSON(object interface{}) *Response {
@@ -56,12 +38,12 @@ func (response *Response) JSON(object interface{}) *Response {
 		return response
 	}
 
-	err := json.NewDecoder(response.httpResponse.Body).Decode(object)
+	err := json.NewDecoder(bytes.NewReader(response.body)).Decode(object)
 	if err != nil {
 		return response.setErr(err)
 	}
 
-	return response.Close()
+	return response
 }
 
 // XML parses the response body as XML and deserializes it
@@ -71,12 +53,12 @@ func (response *Response) XML(object interface{}) *Response {
 		return response
 	}
 
-	err := xml.NewDecoder(response.httpResponse.Body).Decode(object)
+	err := xml.NewDecoder(bytes.NewReader(response.body)).Decode(object)
 	if err != nil {
 		return response.setErr(err)
 	}
 
-	return response.Close()
+	return response
 }
 
 // Error returns an Error struct which can be accepted as
