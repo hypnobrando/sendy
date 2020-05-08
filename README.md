@@ -4,6 +4,8 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Go Report Card](https://goreportcard.com/badge/github.com/brandoneprice31/sendy)](https://goreportcard.com/report/github.com/brandoneprice31/sendy)
 
+Go HTTP Client that prevents you from having to write boilerplate code setting up a native `*http.Client`, creating a request, and parsing the response.  This package uses the [builder pattern](https://medium.com/@haluan/golang-builder-design-pattern-a8b7c92969a7) for constructing requests and parsing responses.
+
 ## Quick Start
 
 ```go
@@ -36,3 +38,27 @@ func main() {
     fmt.Println(user)
 }
 ```
+
+## Installation / Usage
+
+To install `sendy`, use `go get`:
+```
+go get github.com/stretchr/testify
+```
+
+Import the `brandoneprice31/sendy` package into your code:
+```go
+import "github.com/brandoneprice31/sendy"
+
+func main() {
+    httpClient := sendy.NewClient()
+}
+```
+
+## Staying Up to Date
+
+To update `sendy` to the latest version, use `go get -u github.com/brandoneprice31/sendy`.
+
+## Contributing
+
+Please feel free to submit issues, fork the repository and send pull requests!
