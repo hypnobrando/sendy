@@ -15,8 +15,14 @@ type Response struct {
 }
 
 // StatusCode returns the HTTP status code of the response.
+// If there was an error making the request and no response was
+// read then the status code returned is -1.
 func (response *Response) StatusCode() int {
-	return response.httpResponse.StatusCode
+	if response.httpResponse != nil {
+		return response.httpResponse.StatusCode
+	}
+
+	return -1
 }
 
 func (response *Response) setErr(err error) *Response {
@@ -64,16 +70,16 @@ func (response *Response) JSON(object interface{}) *Response {
 // the response.  Non-200 status codes are also returned
 // as an Error.
 func (response *Response) Error() *Error {
+	if response.err != nil {
+		return &Error{
+			err: response.err,
+		}
+	}
+
 	statusCode := response.StatusCode()
 	if statusCode >= 300 {
 		return &Error{
 			statusCode: statusCode,
-		}
-	}
-
-	if response.err != nil {
-		return &Error{
-			err: response.err,
 		}
 	}
 
