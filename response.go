@@ -61,13 +61,12 @@ func (response *Response) XML(object interface{}) *Response {
 	return response
 }
 
-// Error returns an Error struct which can be accepted as
-// an error interface.  This Error contains an error's that
+// Error returns an Error struct.  This Error contains an error's that
 // might have occurred during the build process, during
 // the lifetime of the request, or even during the parsing of
-// the response.  Non-200 status codes are also returned
+// the response.  Non-2XX status codes are also returned
 // as an Error.
-func (response *Response) Error() *Error {
+func (response *Response) Error() error {
 	if response.err != nil {
 		return &Error{
 			err: response.err,
