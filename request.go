@@ -6,8 +6,10 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 type (
@@ -147,6 +149,44 @@ func (request *Request) XML(object interface{}) *Request {
 
 	request.body = bytes.NewReader(xmlBytes)
 	return request
+}
+
+// MultiPartForm serializes the input values into a multi-part form request.
+func (request *Request) MultiPartForm(values map[string]io.Reader) *Request {
+	if request.err != nil {
+		return request
+	}
+
+	var b bytes.Buffer
+	var err error
+
+	w := multipart.NewWriter(&b)
+	defer w.Close()
+
+	for key, r := range values {
+		var fw io.Writer
+		if x, ok := r.(io.Closer); ok {
+			defer x.Close()
+		}
+
+		if x, ok := r.(*os.File); ok {
+			if fw, err = w.CreateFormFile(key, x.Name()); err != nil {
+				return request.setErr(err)
+			}
+
+		} else {
+			if fw, err = w.CreateFormField(key); err != nil {
+				return request.setErr(err)
+			}
+		}
+
+		if _, err = io.Copy(fw, r); err != nil {
+			return request.setErr(err)
+		}
+	}
+
+	request.body = &b
+	return request.Header("Content-Type", w.FormDataContentType())
 }
 
 type (
