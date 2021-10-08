@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 )
 
 type (
@@ -177,7 +178,7 @@ func (request *Request) MultiPartForm(values map[string]io.Reader) *Request {
 		}
 
 		if x, ok := r.(*os.File); ok {
-			if fw, err = w.CreateFormFile(key, x.Name()); err != nil {
+			if fw, err = w.CreateFormFile(key, filepath.Base(x.Name())); err != nil {
 				return request.setErr(err)
 			}
 
