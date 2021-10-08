@@ -12,12 +12,14 @@ Go HTTP Client that prevents you from having to write boilerplate code setting u
 package main
 
 import (
+    "fmt"
+
     "github.com/brandoneprice31/sendy"
 )
 
 type (
     User struct {
-        ID   int    `json:"id""`
+        ID   int    `json:"id"`
         Name string `json:"name"`
     }
 )
@@ -43,7 +45,7 @@ func main() {
 
 To install `sendy`, use `go get`:
 ```
-go get github.com/stretchr/testify
+go get github.com/brandoneprice31/sendy
 ```
 
 Import the `brandoneprice31/sendy` package into your code:

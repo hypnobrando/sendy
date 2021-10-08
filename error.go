@@ -17,7 +17,7 @@ var _ error = (*Error)(nil)
 // Error implements the native error interface.
 func (err *Error) Error() string {
 	if err.err != nil {
-		return err.Error()
+		return err.err.Error()
 	}
 
 	return fmt.Sprintf("Status code: %d", err.statusCode)

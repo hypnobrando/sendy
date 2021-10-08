@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -78,8 +79,14 @@ func (request *Request) SendIt() *Response {
 		}
 	}
 
+	body, err := ioutil.ReadAll(httpResponse.Body)
+	if err != nil {
+		return &Response{err: err}
+	}
+
 	return &Response{
-		httpResponse: httpResponse,
+		body:       body,
+		statusCode: httpResponse.StatusCode,
 	}
 }
 
