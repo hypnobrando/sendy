@@ -61,6 +61,11 @@ func (response *Response) XML(object interface{}) *Response {
 	return response
 }
 
+// Raw returns the raw body and any errors associated with the request.
+func (response *Response) Raw() ([]byte, error) {
+	return response.body, response.err
+}
+
 // Error returns an Error struct.  This Error contains an error's that
 // might have occurred during the build process, during
 // the lifetime of the request, or even during the parsing of
