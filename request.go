@@ -44,7 +44,7 @@ func (request *Request) SendIt() *Response {
 		return response.setErr(request.err)
 	}
 
-	var params url.Values
+	params := url.Values{}
 	for _, param := range request.params {
 		params.Set(param.Key, param.Value)
 	}
