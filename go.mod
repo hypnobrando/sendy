@@ -1,4 +1,4 @@
-module github.com/brandoneprice31/sendy
+module github.com/hypnobrando/sendy
 
 go 1.14
 

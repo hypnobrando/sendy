@@ -1,8 +1,8 @@
 # sendy
 
-[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/brandoneprice31/sendy)
+[![godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/hypnobrando/sendy)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
-[![Go Report Card](https://goreportcard.com/badge/github.com/brandoneprice31/sendy)](https://goreportcard.com/report/github.com/brandoneprice31/sendy)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hypnobrando/sendy)](https://goreportcard.com/report/github.com/hypnobrando/sendy)
 
 Go HTTP Client that prevents you from having to write boilerplate code setting up a native `*http.Client`, creating a request, and parsing the response.  This package uses the [builder pattern](https://medium.com/@haluan/golang-builder-design-pattern-a8b7c92969a7) for constructing requests and parsing responses.
 
@@ -14,7 +14,7 @@ package main
 import (
     "fmt"
 
-    "github.com/brandoneprice31/sendy"
+    "github.com/hypnobrando/sendy"
 )
 
 type (
@@ -45,12 +45,12 @@ func main() {
 
 To install `sendy`, use `go get`:
 ```
-go get github.com/brandoneprice31/sendy
+go get github.com/hypnobrando/sendy
 ```
 
-Import the `brandoneprice31/sendy` package into your code:
+Import the `hypnobrando/sendy` package into your code:
 ```go
-import "github.com/brandoneprice31/sendy"
+import "github.com/hypnobrando/sendy"
 
 func main() {
     httpClient := sendy.NewClient()
@@ -59,7 +59,7 @@ func main() {
 
 ## Staying Up to Date
 
-To update `sendy` to the latest version, use `go get -u github.com/brandoneprice31/sendy`.
+To update `sendy` to the latest version, use `go get -u github.com/hypnobrando/sendy`.
 
 ## Contributing
 
