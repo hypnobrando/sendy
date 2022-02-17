@@ -11,9 +11,10 @@ import (
 // request and can be used for parsing / inspecting
 // the response.
 type Response struct {
-	body       []byte
-	statusCode int
-	err        error
+	httpResponse *http.Response
+	body         []byte
+	statusCode   int
+	err          error
 }
 
 // StatusCode returns the HTTP status code of the response.
@@ -91,5 +92,5 @@ func (response *Response) Error() error {
 
 // Headers returns the response headers.
 func (response *Response) Headers() http.Header {
-	return response.Headers()
+	return response.httpResponse.Header
 }

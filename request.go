@@ -86,8 +86,9 @@ func (request *Request) SendIt() *Response {
 	}
 
 	return &Response{
-		body:       body,
-		statusCode: httpResponse.StatusCode,
+		httpResponse: httpResponse,
+		body:         body,
+		statusCode:   httpResponse.StatusCode,
 	}
 }
 
