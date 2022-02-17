@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	"net/http"
 )
 
 // Response contains the response after making an HTTP
@@ -86,4 +87,9 @@ func (response *Response) Error() error {
 	}
 
 	return nil
+}
+
+// Headers returns the response headers.
+func (response *Response) Headers() http.Header {
+	return response.Headers()
 }
