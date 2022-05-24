@@ -50,7 +50,7 @@ func (request *Request) SendIt() *Response {
 	}
 
 	var paramString string
-	if params != nil {
+	if len(params) > 0 {
 		paramString = fmt.Sprintf("?%s", params.Encode())
 	}
 
