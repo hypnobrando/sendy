@@ -53,7 +53,7 @@ func (request *Request) SendIt() *Response {
 
 	urlEncodedParams := url.Values{}
 	for _, param := range request.urlEncodedParams {
-		params.Set(param.Key, param.Value)
+		urlEncodedParams.Set(param.Key, param.Value)
 	}
 
 	var paramString string
@@ -66,6 +66,10 @@ func (request *Request) SendIt() *Response {
 	requestBody := request.body
 	if len(urlEncodedParams) > 0 {
 		requestBody = strings.NewReader(urlEncodedParams.Encode())
+		request.headers = append(request.headers, Header{
+			Key:   "Content-Type",
+			Value: "application/x-www-form-urlencoded",
+		})
 	}
 
 	httpRequest, err := http.NewRequest(request.method, url, requestBody)
