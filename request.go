@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type (
@@ -24,6 +25,7 @@ type (
 		method             string
 		path               string
 		params             Params
+		urlEncodedParams   Params
 		headers            Headers
 		username, password string
 		body               io.Reader
@@ -49,6 +51,11 @@ func (request *Request) SendIt() *Response {
 		params.Set(param.Key, param.Value)
 	}
 
+	urlEncodedParams := url.Values{}
+	for _, param := range request.urlEncodedParams {
+		params.Set(param.Key, param.Value)
+	}
+
 	var paramString string
 	if len(params) > 0 {
 		paramString = fmt.Sprintf("?%s", params.Encode())
@@ -56,7 +63,12 @@ func (request *Request) SendIt() *Response {
 
 	url := fmt.Sprintf("%s%s%s", request.host, request.path, paramString)
 
-	httpRequest, err := http.NewRequest(request.method, url, request.body)
+	requestBody := request.body
+	if len(urlEncodedParams) > 0 {
+		requestBody = strings.NewReader(urlEncodedParams.Encode())
+	}
+
+	httpRequest, err := http.NewRequest(request.method, url, requestBody)
 	if err != nil {
 		return &Response{err: err}
 	}
@@ -157,6 +169,11 @@ func (request *Request) XML(object interface{}) *Request {
 	}
 
 	request.body = bytes.NewReader(xmlBytes)
+	return request
+}
+
+func (request *Request) URLEncodedParam(key, value string) *Request {
+	request.urlEncodedParams = append(request.urlEncodedParams, Param{key, value})
 	return request
 }
 
