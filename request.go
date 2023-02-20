@@ -181,8 +181,13 @@ func (request *Request) URLEncodedParam(key, value string) *Request {
 	return request
 }
 
+type FormEntry struct {
+	Key   string
+	Value io.Reader
+}
+
 // MultiPartForm serializes the input values into a multi-part form request.
-func (request *Request) MultiPartForm(values map[string]io.Reader) *Request {
+func (request *Request) MultiPartForm(values []FormEntry) *Request {
 	if request.err != nil {
 		return request
 	}
@@ -193,24 +198,24 @@ func (request *Request) MultiPartForm(values map[string]io.Reader) *Request {
 	w := multipart.NewWriter(&b)
 	defer w.Close()
 
-	for key, r := range values {
+	for _, entry := range values {
 		var fw io.Writer
-		if x, ok := r.(io.Closer); ok {
+		if x, ok := entry.Value.(io.Closer); ok {
 			defer x.Close()
 		}
 
-		if x, ok := r.(*os.File); ok {
-			if fw, err = w.CreateFormFile(key, filepath.Base(x.Name())); err != nil {
+		if x, ok := entry.Value.(*os.File); ok {
+			if fw, err = w.CreateFormFile(entry.Key, filepath.Base(x.Name())); err != nil {
 				return request.setErr(err)
 			}
 
 		} else {
-			if fw, err = w.CreateFormField(key); err != nil {
+			if fw, err = w.CreateFormField(entry.Key); err != nil {
 				return request.setErr(err)
 			}
 		}
 
-		if _, err = io.Copy(fw, r); err != nil {
+		if _, err = io.Copy(fw, entry.Value); err != nil {
 			return request.setErr(err)
 		}
 	}
