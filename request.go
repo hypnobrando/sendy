@@ -144,6 +144,12 @@ func (request *Request) BasicAuth(username, password string) *Request {
 	return request
 }
 
+// RawBody sets the raw bytes as the body of the request.
+func (request *Request) RawBody(raw []byte) *Request {
+	request.body = bytes.NewReader(raw)
+	return request
+}
+
 // JSON serializes the input object into the body of the
 // request in the form of JSON.
 func (request *Request) JSON(object interface{}) *Request {
