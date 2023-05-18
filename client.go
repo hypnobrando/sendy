@@ -37,11 +37,7 @@ func defaultClient(host string) *Client {
 // WithRetriesAndTimeout sets the HTTP transport on the client.
 func (c *Client) WithRetriesAndTimeout(maxRetries int, timeout time.Duration) *Client {
 	return c.
-		Transport(rehttp.NewTransport(
-			nil,
-			rehttp.RetryAll(rehttp.RetryMaxRetries(maxRetries), rehttp.RetryTemporaryErr()),
-			rehttp.ExpJitterDelay(time.Second, timeout/time.Duration(maxRetries)),
-		)).
+		Transport(defaultTransport(maxRetries, timeout)).
 		Timeout(timeout)
 }
 
@@ -53,6 +49,10 @@ func defaultTransport(maxRetries int, timeout time.Duration) *rehttp.Transport {
 			rehttp.RetryAny(
 				rehttp.RetryTemporaryErr(),
 				rehttp.RetryIsErr(func(err error) bool {
+					if err == nil {
+						return false
+					}
+
 					return strings.Contains(err.Error(), "net/http: request canceled (Client.Timeout exceeded while awaiting headers)")
 				}),
 			),
