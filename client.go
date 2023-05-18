@@ -2,6 +2,7 @@ package sendy
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/rehttp"
@@ -30,12 +31,33 @@ func NewClient() *Client {
 func defaultClient(host string) *Client {
 	return NewClient().
 		Host(host).
+		WithRetriesAndTimeout(3, 12*time.Second)
+}
+
+func (c *Client) WithRetriesAndTimeout(maxRetries int, timeout time.Duration) *Client {
+	return c.
 		Transport(rehttp.NewTransport(
 			nil,
-			rehttp.RetryAll(rehttp.RetryMaxRetries(3), rehttp.RetryTemporaryErr()),
-			rehttp.ExpJitterDelay(time.Second, 12*time.Second),
+			rehttp.RetryAll(rehttp.RetryMaxRetries(maxRetries), rehttp.RetryTemporaryErr()),
+			rehttp.ExpJitterDelay(time.Second, timeout),
 		)).
 		Timeout(time.Minute)
+}
+
+func defaultTransport(maxRetries int, timeout time.Duration) *rehttp.Transport {
+	return rehttp.NewTransport(
+		nil,
+		rehttp.RetryAll(
+			rehttp.RetryMaxRetries(maxRetries),
+			rehttp.RetryAny(
+				rehttp.RetryTemporaryErr(),
+				rehttp.RetryIsErr(func(err error) bool {
+					return strings.Contains(err.Error(), "net/http: request canceled (Client.Timeout exceeded while awaiting headers)")
+				}),
+			),
+		),
+		rehttp.ExpJitterDelay(time.Second, timeout),
+	)
 }
 
 // Host overrides the host of the Client.
