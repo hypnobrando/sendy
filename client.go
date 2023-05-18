@@ -2,7 +2,6 @@ package sendy
 
 import (
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/rehttp"
@@ -46,16 +45,7 @@ func defaultTransport(maxRetries int, timeout time.Duration) *rehttp.Transport {
 		nil,
 		rehttp.RetryAll(
 			rehttp.RetryMaxRetries(maxRetries),
-			rehttp.RetryAny(
-				rehttp.RetryTemporaryErr(),
-				rehttp.RetryIsErr(func(err error) bool {
-					if err == nil {
-						return false
-					}
-
-					return strings.Contains(err.Error(), "net/http: request canceled (Client.Timeout exceeded while awaiting headers)")
-				}),
-			),
+			rehttp.RetryTemporaryErr(),
 		),
 		rehttp.ExpJitterDelay(time.Second, timeout),
 	)
