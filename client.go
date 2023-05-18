@@ -38,7 +38,7 @@ func defaultClient(host string) *Client {
 func (c *Client) WithRetriesAndTimeout(maxRetries int, timeout time.Duration) *Client {
 	return c.
 		Transport(defaultTransport(maxRetries, timeout)).
-		Timeout(timeout)
+		Timeout(time.Duration(maxRetries) * timeout)
 }
 
 func defaultTransport(maxRetries int, timeout time.Duration) *rehttp.Transport {
