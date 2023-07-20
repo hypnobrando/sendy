@@ -163,6 +163,17 @@ func (request *Request) JSON(object interface{}) *Request {
 	}
 
 	request.body = bytes.NewReader(jsonBytes)
+
+	request.headers = append(request.headers, Header{
+		Key:   "Content-Type",
+		Value: "application/json",
+	})
+
+	request.headers = append(request.headers, Header{
+		Key:   "Content-Length",
+		Value: fmt.Sprintf("%d", len(jsonBytes)),
+	})
+
 	return request
 }
 
