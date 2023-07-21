@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -171,7 +172,7 @@ func (request *Request) JSON(object interface{}) *Request {
 
 	request.headers = append(request.headers, Header{
 		Key:   "Content-Length",
-		Value: fmt.Sprintf("%d", len(jsonBytes)),
+		Value: strconv.Itoa(len(string(jsonBytes))),
 	})
 
 	return request
