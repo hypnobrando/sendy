@@ -172,7 +172,7 @@ func (request *Request) JSON(object interface{}) *Request {
 
 	request.headers = append(request.headers, Header{
 		Key:   "Content-Length",
-		Value: strconv.Itoa(len(string(jsonBytes))),
+		Value: strconv.Itoa(len(jsonBytes)),
 	})
 
 	return request

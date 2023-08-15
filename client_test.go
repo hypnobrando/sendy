@@ -46,3 +46,73 @@ func TestPost(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 101, response.ID)
 }
+
+type (
+	testBody struct {
+		ExternalID      string                 `json:"external_id"`
+		TicketProceeds  testBodyTicketProceeds `json:"ticket_proceeds"`
+		Seating         testBodySeating        `json:"seating"`
+		TicketType      string                 `json:"ticket_type"`
+		SplitType       string                 `json:"split_type"`
+		NumberOfTickets int                    `json:"number_of_tickets"`
+		Event           testBodyEvent          `json:"event"`
+		Venue           testBodyVenue          `json:"venue"`
+	}
+
+	testBodyTicketProceeds struct {
+		Amount       int    `json:"amount"`
+		CurrencyCode string `json:"currency_code"`
+		Display      string `json:"display"`
+	}
+
+	testBodySeating struct {
+		Section string `json:"section"`
+		Row     string `json:"row"`
+	}
+
+	testBodyEvent struct {
+		Name      string `json:"name"`
+		StartDate string `json:"start_date"`
+	}
+
+	testBodyVenue struct {
+		Name string `json:"name"`
+	}
+)
+
+func TestContentLength(t *testing.T) {
+	request := NewClient().
+		Host("https://google.com").
+		Post().
+		JSON(testBody{
+			ExternalID: "1239-22112",
+			TicketProceeds: testBodyTicketProceeds{
+				Amount:       30,
+				CurrencyCode: "USD",
+				Display:      "$30.00",
+			},
+			Seating: testBodySeating{
+				Section: "General Admission",
+				Row:     "General Admission",
+			},
+			TicketType:      "ETicketUrl",
+			SplitType:       "Any",
+			NumberOfTickets: 99,
+			Event: testBodyEvent{
+				Name:      "Keystone Revisited",
+				StartDate: "2023-09-08T21:30:00",
+			},
+			Venue: testBodyVenue{
+				Name: "The Lariat in Buena Vista",
+			},
+		})
+
+	for _, h := range request.headers {
+		if h.Key == "Content-Length" {
+			assert.Equal(t, "356", h.Value)
+			return
+		}
+	}
+
+	t.Fatal("Content-Length header not found")
+}
