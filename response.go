@@ -92,5 +92,9 @@ func (response *Response) Error() error {
 
 // Headers returns the response headers.
 func (response *Response) Headers() http.Header {
+	if response.httpResponse == nil {
+		return http.Header{}
+	}
+
 	return response.httpResponse.Header
 }
