@@ -2,6 +2,7 @@ package sendy
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -20,6 +21,7 @@ type (
 	// Request is an HTTP builder struct for making an
 	// HTTP request.
 	Request struct {
+		ctx                context.Context
 		httpClient         *http.Client
 		host               string
 		hooks              Hooks
@@ -73,7 +75,18 @@ func (request *Request) SendIt() *Response {
 		})
 	}
 
-	httpRequest, err := http.NewRequest(request.method, url, requestBody)
+	var (
+		httpRequest *http.Request
+		err         error
+	)
+
+	if request.ctx != nil {
+		httpRequest, err = http.NewRequestWithContext(request.ctx, request.method, url, requestBody)
+
+	} else {
+		httpRequest, err = http.NewRequest(request.method, url, requestBody)
+	}
+
 	if err != nil {
 		return &Response{err: err}
 	}
@@ -107,6 +120,11 @@ func (request *Request) SendIt() *Response {
 		body:         body,
 		statusCode:   httpResponse.StatusCode,
 	}
+}
+
+func (request *Request) Context(ctx context.Context) *Request {
+	request.ctx = ctx
+	return request
 }
 
 // Method overrides the HTTP request method.
