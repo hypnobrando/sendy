@@ -51,7 +51,7 @@ func (request *Request) SendIt() *Response {
 
 	params := url.Values{}
 	for _, param := range request.params {
-		params.Set(param.Key, param.Value)
+		params.Add(param.Key, param.Value)
 	}
 
 	urlEncodedParams := url.Values{}
