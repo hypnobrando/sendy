@@ -14,6 +14,7 @@ type (
 		host               string
 		username, password string
 		hooks              Hooks
+		requestHooks       RequestHooks
 		headers            []Header
 		httpClient         *http.Client
 	}
@@ -92,12 +93,13 @@ func (c *Client) BasicAuth(username, password string) *Client {
 
 func (c *Client) request() *Request {
 	return &Request{
-		httpClient: c.httpClient,
-		host:       c.host,
-		headers:    c.headers,
-		username:   c.username,
-		password:   c.password,
-		hooks:      c.hooks,
+		httpClient:   c.httpClient,
+		host:         c.host,
+		headers:      c.headers,
+		username:     c.username,
+		password:     c.password,
+		hooks:        c.hooks,
+		requestHooks: append(RequestHooks(nil), c.requestHooks...),
 	}
 }
 
