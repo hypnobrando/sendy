@@ -57,6 +57,23 @@ func main() {
 }
 ```
 
+## Request hooks
+
+`Hook` runs immediately before a request is sent (used by `DumpRequests`). `RequestHook` runs before **and** after the HTTP round-trip so callers can start and end spans, inject headers, or record status codes.
+
+```go
+type RequestHook interface {
+    BeforeRequest(ctx context.Context, req *http.Request) (context.Context, error)
+    AfterRequest(ctx context.Context, req *http.Request, resp *http.Response, err error)
+}
+
+sendy.AddRequestHook(myHook)          // every client, including Get/Post helpers
+client.RequestHook(myHook)            // one client
+request.RequestHook(myHook)           // one request
+```
+
+`AddRequestHook` is read when the request is sent, so it applies to clients created earlier.
+
 ## Staying Up to Date
 
 To update `sendy` to the latest version, use `go get -u github.com/hypnobrando/sendy`.
