@@ -25,6 +25,7 @@ type (
 		httpClient         *http.Client
 		host               string
 		hooks              Hooks
+		requestHooks       RequestHooks
 		method             string
 		path               string
 		params             Params
@@ -103,14 +104,31 @@ func (request *Request) SendIt() *Response {
 		hook.Request(httpRequest)
 	}
 
+	ctx := request.ctx
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	requestHooks := append(copyGlobalRequestHooks(), request.requestHooks...)
+	for _, hook := range requestHooks {
+		ctx, err = hook.BeforeRequest(ctx, httpRequest)
+		if err != nil {
+			return &Response{err: err}
+		}
+	}
+
+	httpRequest = httpRequest.WithContext(ctx)
+
 	httpResponse, err := request.httpClient.Do(httpRequest)
 	if err != nil {
+		afterRequestHooks(requestHooks, ctx, httpRequest, nil, err)
 		return &Response{
 			err: err,
 		}
 	}
 
 	body, err := ioutil.ReadAll(httpResponse.Body)
+	afterRequestHooks(requestHooks, ctx, httpRequest, httpResponse, err)
 	if err != nil {
 		return &Response{err: err}
 	}
@@ -119,6 +137,18 @@ func (request *Request) SendIt() *Response {
 		httpResponse: httpResponse,
 		body:         body,
 		statusCode:   httpResponse.StatusCode,
+	}
+}
+
+func afterRequestHooks(
+	hooks RequestHooks,
+	ctx context.Context,
+	req *http.Request,
+	resp *http.Response,
+	err error,
+) {
+	for i := len(hooks) - 1; i >= 0; i-- {
+		hooks[i].AfterRequest(ctx, req, resp, err)
 	}
 }
 
